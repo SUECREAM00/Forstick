@@ -24,7 +24,7 @@ async function mockStt(page) {
       }
       if (JSON.parse(m).type === 'flush') {
         seen.flush += 1;
-        ws.send(JSON.stringify({ kind: 'final', text: FINAL, raw_text: FINAL, confidence: 0.93 }));
+        ws.send(JSON.stringify({ kind: 'final', text: FINAL, raw_text: FINAL, confidence: 0.93, request_id: 'stt-req-1' }));
       }
     });
   });
@@ -45,18 +45,41 @@ test.describe('음성 입력', () => {
     await expect(panel(page).locator('.cmd-partial')).toHaveText('A 자재를');
   });
 
-  test('[UI-VOICE-02][SFR-001] final이 오면 stt_final로 1회만 보낸다(partial로는 보내지 않는다)', async ({ page }) => {
+  test('[UI-VOICE-02][SFR-001] partial은 보내지 않고, 서버가 확정한 final은 같은 명령 경로로 1회 자동 전송한다(원문 표시)', async ({ page }) => {
     const calls = await mockBackend(page);
     const seen = await mockStt(page);
     await page.goto('/');
     await panel(page).getByRole('button', { name: /음성 입력/ }).click();
     await expect(panel(page).locator('.cmd-partial')).toHaveText('A 자재를');
+    await page.waitForTimeout(400);
     expect(calls.filter((c) => c.path.endsWith('/command'))).toHaveLength(0);
     await panel(page).getByRole('button', { name: /음성 인식 중/ }).click();
     await expect.poll(() => calls.filter((c) => c.path.endsWith('/command')).length).toBe(1);
     const body = calls.find((c) => c.path.endsWith('/command')).body;
     expect(body).toMatchObject({ source: 'stt_final', utterance: FINAL, raw_transcript: FINAL, stt_confidence: 0.93 });
+    await expect(panel(page).getByTestId('voice-sent')).toHaveText(`음성으로 보낸 문장: “${FINAL}”`);
+    await panel(page).screenshot({ path: 'e2e-results/screens/voice-autosent.png' });
+    await page.waitForTimeout(500);
+    expect(calls.filter((c) => c.path.endsWith('/command'))).toHaveLength(1);
     expect(seen.flush).toBe(1);
+  });
+
+  test('[UI-VOICE-05][SFR-001] 잘못 인식했으면 문장을 고쳐 다시 보내고, 고친 문장은 텍스트로 간다(STT 신뢰도를 붙이지 않는다)', async ({ page }) => {
+    const calls = await mockBackend(page);
+    await mockStt(page);
+    await page.goto('/');
+    await panel(page).getByRole('button', { name: /음성 입력/ }).click();
+    await expect(panel(page).locator('.cmd-partial')).toHaveText('A 자재를');
+    await panel(page).getByRole('button', { name: /음성 인식 중/ }).click();
+    await expect.poll(() => calls.filter((c) => c.path.endsWith('/command')).length).toBe(1);
+    await panel(page).getByRole('button', { name: '문장 수정해 다시 보내기' }).click();
+    await expect(page.getByLabel('자연어 명령')).toHaveValue(FINAL);
+    await page.getByLabel('자연어 명령').fill('B 자재를 컨베이어로 옮겨줘');
+    await panel(page).getByRole('button', { name: '보내기' }).click();
+    await expect.poll(() => calls.filter((c) => c.path.endsWith('/command')).length).toBe(2);
+    const body = calls.filter((c) => c.path.endsWith('/command'))[1].body;
+    expect(body).toMatchObject({ source: 'text', utterance: 'B 자재를 컨베이어로 옮겨줘' });
+    expect(body.stt_confidence).toBeUndefined();
   });
 
   test('[UI-VOICE-03][SFR-001] STT 기능이 꺼져 있으면 마이크가 잠기고 이유가 보인다', async ({ page }) => {

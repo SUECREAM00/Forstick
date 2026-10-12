@@ -33,6 +33,8 @@ from server.api import Api, ApiError
 from server.auth import AuthService, cookie_token
 from server.config import ServerConfig
 from server.exit_watchdog import arm_exit_watchdog
+from server.request_limits import limited_receive as _limited_receive, read_json_body
+from server.robot_names import RobotNames
 from server.routes import (
     HTTP_ROUTES,
     auth as auth_routes,
@@ -68,6 +70,18 @@ class Application:
         self.hub = EventHub()
         self.auth = AuthService(repository=self.runtime.repository, config=self.config)
         self.api.listeners.append(self.hub.fanout)
+        # 반복 작업(2026-10-07): 작업 셀 시연 실행기가 있을 때만. 상태 파일은 시연 상태 파일 옆(셀마다 따로).
+        if getattr(self.runtime, "sim_demo_jobs", None) is not None:
+            from pathlib import Path
+
+            from server.repeat_runs import RepeatRuns
+            from validation.simulation_demo_state import DEFAULT_PATH as _STATE
+
+            state_path = Path(getattr(self.runtime, "simulation_demo_state_path", None) or _STATE)
+            self.runtime.repeat_runs = RepeatRuns(api=self.api, runtime=self.runtime,
+                                                  path=state_path.with_name("repeat_runs.json"))
+        # 로봇 이름·호출어(2026-10-07): DB 옆 파일 — 새로고침·다른 브라우저에서도 같은 이름.
+        self.runtime.robot_names = RobotNames(self.config.db_path.with_name("robot_settings.json"))
         self.ctx = RouteContext(
             api=self.api, runtime=self.runtime, config=self.config,
             hub=self.hub, read_body=self._body,
@@ -108,6 +122,7 @@ class Application:
     async def _http(self, scope, receive, send) -> None:
         path = scope["path"]
         method = scope["method"]
+        receive = _limited_receive(receive, scope.get("headers", []))
         query = _query_dict(scope.get("query_string", b""))
         token = cookie_token(scope.get("headers", []))
         actor = self.auth.actor_of(method, path, token)
@@ -140,23 +155,7 @@ class Application:
             print(f"[audit] 명령 보낸 사람 기록 실패 {method} {path}: {type(exc).__name__}: {exc}", file=sys.stderr)
 
     async def _body(self, receive) -> dict:
-        chunks = b""
-        while True:
-            message = await receive()
-            if message["type"] == "http.disconnect":
-                raise ApiError(400, None, "요청이 끊겼다")
-            chunks += message.get("body", b"")
-            if not message.get("more_body"):
-                break
-        if not chunks:
-            return {}
-        try:
-            payload = json.loads(chunks)
-        except json.JSONDecodeError as exc:
-            raise ApiError(400, None, f"JSON이 아니다: {exc}") from None
-        if not isinstance(payload, dict):
-            raise ApiError(400, None, "객체가 아니다")
-        return payload
+        return await read_json_body(receive)   # 상한은 `_limited_receive`가 읽는 도중에 본다(server/request_limits.py)
 
     async def _route(
         self, method: str, path: str, receive, query: dict[str, str],
@@ -208,7 +207,7 @@ class Application:
             )
             return
         if path == "/v1/stt":
-            await stt_routes.stt_socket(self.ctx, receive, send, session_id)
+            await stt_routes.stt_socket(self.ctx, receive, send, session_id, query.get("mode", ""))
             return
         if path == SCENE_STREAM_PATH:
             await scene_routes.scene_socket(self.ctx, receive, send)

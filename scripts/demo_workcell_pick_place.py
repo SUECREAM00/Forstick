@@ -151,6 +151,8 @@ from validation.simulation_e2e import (  # noqa: E402
 )
 
 ENV_GATE = "FORSTICK2_SIM_PICK_PLACE_DEMO"
+#: 단계 계획 줄 머리(서버 server/sim_demo_jobs.STAGE_PLAN_PREFIX와 같아야 한다 — 시험으로 확인).
+STAGE_PLAN_PREFIX = "[단계 계획]"
 from core.workcell_paths import log_dir as _log_dir, workcell_config as _workcell_config  # noqa: E402
 from robots.fr3_gazebo.paths import moveit_urdf as _moveit_urdf  # noqa: E402
 
@@ -806,6 +808,17 @@ class Follower(threading.Thread):
         self.join(timeout=2.0)
 
 
+def print_stage_plan(stages, *, numbered: bool = False) -> None:
+    """실행 전에 단계 계획(번호·이름) 한 줄을 남긴다(2026-10-08, 진행 표시용 — 읽기 전용).
+
+    서버(`server/sim_demo_jobs.parse_stage_plan`)가 이 줄로 아직 시작하지 않은 단계의 이름을 화면에 준다.
+    단계 진행(`[ n/N] 이름 오차 … 도달=`) 줄은 그대로다 — 완료 여부는 그 줄만 근거다."""
+    # numbered=True: 실행 순서 번호(재개처럼 단계 번호가 계획과 다른 실행 — 진행 줄도 같은 번호를 쓴다).
+    rows = [{"no": i if numbered else int(stage.no), "label": str(stage.label)}
+            for i, stage in enumerate(stages, 1)]
+    print(f"{STAGE_PLAN_PREFIX} " + json.dumps({"of": len(rows), "stages": rows}, ensure_ascii=False), flush=True)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument("support", help="출발 위치 자원 id 또는 Gazebo 모델")
@@ -1001,6 +1014,11 @@ def main() -> int:
             detail += (f" — 시뮬레이션 시연 상태가 셀에 남아 있다"
                        f" ({', '.join(sorted(left))}), --restore-only로"
                        " 되돌린 뒤 다시 시작한다")
+        if reason == ReasonCode.GEOMETRY_COLLISION and detail.startswith("안전 home 경로 "):
+            # 첫 경로(지금 자세 → 안전 home)에서 닿는다 — 팔이 home이 아닌 자세(예: 그리퍼 닫기 중 정지 → 복구 뒤
+            # 집기 자세)에 남아 있다(2026-10-09 격리 셀 재현). 화면이 그대로 보여 줄 다음 조치를 함께 남긴다.
+            preflight_extra["next_action"] = ("로봇이 안전 home 자세가 아니라 출발 경로가 자재와 닿습니다 — "
+                                              "'로봇을 홈 위치로 이동해'로 먼저 홈에 보낸 뒤 다시 요청해 주세요")
         result = not_started(
             scenario=scenario, object_id=object_rid, support_id=support_rid,
             target_id=target_rid, reason=reason, detail=detail,
@@ -1217,6 +1235,7 @@ def main() -> int:
     note_pose("before_start")
 
     probe_added = False
+    print_stage_plan(stages)
     for stage in stages:
         if args.inject_scene_change_at == stage.stage and not probe_added:
             probe_added = _apply_probe(node, add=True)
@@ -1987,7 +2006,9 @@ def run_resume(ctx: ResumeContext, *, checkpoint_id: str,
     detached = False
     stop_requested = False
     stop_info: dict = {}
-    for stage in ([] if faults else exec_stages):
+    if not faults:
+        print_stage_plan(exec_stages, numbered=True)
+    for no, stage in enumerate([] if faults else exec_stages, 1):
         if ctx.client.snapshot().content_hash != scene_hash:
             faults.append((ReasonCode.GEOMETRY_SNAPSHOT_EXPIRED,
                            f"{stage.label} 앞에서 scene이 바뀌었다"))
@@ -2088,6 +2109,9 @@ def run_resume(ctx: ResumeContext, *, checkpoint_id: str,
                 faults.append((exc.reason, str(exc)))
                 break
             ctx.fixture.settle(model)
+        # 진행 줄(2026-10-08): 다른 실행과 같은 형식 — 서버가 단계 완료를 이 줄로만 읽는다.
+        print(f"  [{no:2d}/{len(exec_stages)}] {stage.label:16s}"
+              f" 오차 {error:.5f} rad · 도달={reached}", flush=True)
 
     final_pose = ctx.fixture.pose_of(model, timeout_sec=3.0, fresh=True)
     in_zone = (in_placement_zone(final_pose, ctx.conveyor_zone)
@@ -2140,6 +2164,8 @@ def run_resume(ctx: ResumeContext, *, checkpoint_id: str,
         model, checkpoint_id=checkpoint_id, outcome=outcome_name,
         final_pose_m=final_pose, reasons=reasons, new_checkpoint=new_checkpoint)
     return {**report, "status": status, "reasons": reasons,
+            # 정지 확인 여부(2026-10-08 리뷰 12번): 정지가 없었으면 None, 있었으면 실제 확인 결과.
+            "stop_confirmed": (bool(stop_info.get("confirmed")) if stop_requested else None),
             "robot_commands_sent": len(ctx.commands),
             "commands": list(ctx.commands), "fixture_rebound": rebound,
             "detached": detached, "stage_records": stage_records,
@@ -2672,6 +2698,7 @@ def _run_held_route(*, stages, bindings, client, snapshot, transport, fixture,
     pending_checkpoint: dict | None = None
     attached = detached = False
     print(banner)
+    print_stage_plan(stages)
     for stage in stages:
         current = client.snapshot()
         if current.content_hash != snapshot.content_hash:
