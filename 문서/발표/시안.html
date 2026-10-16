@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>포스틱 발표 시안</title>
+<style>
+  /* 디자인 원본: 파란색 흰색 심플한 비즈니스 보고서 발표 프레젠테이션.pdf (1440×810) */
+  @font-face { font-family: 'Freesentation'; font-weight: 300; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-3Light.woff2') format('woff2'); }
+  @font-face { font-family: 'Freesentation'; font-weight: 400; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-4Regular.woff2') format('woff2'); }
+  @font-face { font-family: 'Freesentation'; font-weight: 500; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-5Medium.woff2') format('woff2'); }
+  @font-face { font-family: 'Freesentation'; font-weight: 700; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-7Bold.woff2') format('woff2'); }
+  @font-face { font-family: 'Freesentation'; font-weight: 900; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-9Black.woff2') format('woff2'); }
+  :root {
+    --band: #7095f8;    /* 아래 파란 띠 */
+    --blue: #4165c1;    /* 원·라벨 채움 */
+    --tint: #eff3ff;    /* 연한 파랑 상자 */
+    --ink: #000000;
+    --body: #333333;
+    --grid: #f2f2f2;    /* 배경 모눈 */
+    --font: 'Freesentation', 'Pretendard', 'Malgun Gothic', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; word-break: keep-all; background: #1d2333; overflow: hidden; font-family: var(--font); color: var(--ink); }
+  .deck { position: absolute; left: 50%; top: 50%; width: 1440px; height: 810px; }
+  .slide { position: absolute; inset: 0; display: none; overflow: hidden;
+           background: linear-gradient(var(--grid) 1.5px, transparent 1.5px) 0 0 / 32px 32px,
+                       linear-gradient(90deg, var(--grid) 1.5px, transparent 1.5px) 0 0 / 32px 32px, #fff; }
+  .slide.on { display: block; }
+  .slide::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; background: var(--band); }
+  .card { position: absolute; left: 63px; top: 60px; right: 62px; bottom: 61px; background: #fff; border: 3px solid var(--ink); }
+  .clip { position: absolute; left: 118px; top: 24px; width: 50px; height: 130px; z-index: 2; }
+  h2 { position: absolute; left: 0; right: 0; top: 112px; text-align: center; font: 900 52px/1.2 var(--font); letter-spacing: -.02em; }
+  .rule { position: absolute; left: 246px; right: 246px; top: 217px; height: 1.5px; background: var(--ink); }
+
+  /* 표지 */
+  .cover { position: absolute; left: 0; right: 0; top: 220px; text-align: center; }
+  .cover .kicker { font: 400 21px/1 var(--font); letter-spacing: .14em; }
+  .cover .light { font: 300 64px/1.15 var(--font); margin-top: 40px; letter-spacing: -.02em; }
+  .cover h1 { font: 900 112px/1.1 var(--font); letter-spacing: -.03em; }
+  .cover .meta { margin: 52px 246px 0; border-top: 1.5px solid var(--ink);
+                 display: flex; justify-content: center; gap: 70px; padding-top: 34px; font: 400 19px/1 var(--font); }
+  .cover .meta b { font-weight: 700; margin-right: 14px; }
+
+  /* 4열 숫자형 (원본 '디자인 핵심 원칙') */
+  .cols { position: absolute; left: 110px; right: 110px; top: 320px; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .col { text-align: center; padding: 0 30px; }
+  .col + .col { border-left: 1.5px solid var(--ink); }
+  .dot { width: 140px; height: 140px; margin: 0 auto; border-radius: 50%; background: var(--blue); color: #fff;
+         display: flex; align-items: center; justify-content: center; font: 900 46px/1 var(--font); letter-spacing: -.02em; }
+  .dot small { font-size: 22px; font-weight: 500; opacity: .8; align-self: flex-end; margin: 0 0 47px 2px; }
+  .col h3 { font: 700 25px/1.3 var(--font); margin-top: 28px; }
+  .col p { font: 400 19px/1.55 var(--font); color: var(--body); margin-top: 12px; }
+
+  /* 흐름형 (원본 '목차' 번호 + '핵심 원칙' 라벨 + '결론' 상자) */
+  .steps { position: absolute; left: 130px; right: 130px; top: 290px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 40px; }
+  .step { position: relative; text-align: center; }
+  .step + .step::before { content: "›"; position: absolute; left: -30px; top: 62px; font: 400 40px/1 var(--font); }
+  .step .n { width: 42px; height: 42px; margin: 0 auto; border-radius: 50%; background: var(--blue); color: #fff;
+             display: grid; place-items: center; font: 700 19px/1 var(--font); }
+  .step .label { margin-top: 16px; padding: 14px 0; background: var(--blue); color: #fff; border: 1.5px solid var(--ink); font: 700 22px/1 var(--font); }
+  .step p { margin-top: 16px; font: 400 18px/1.55 var(--font); color: var(--body); }
+  .conclusion { position: absolute; left: 200px; right: 200px; top: 560px; padding: 22px 32px; background: var(--tint); border: 1.5px solid var(--ink);
+                display: flex; align-items: center; gap: 26px; font: 400 21px/1.5 var(--font); }
+  .conclusion b { flex: none; font: 900 23px/1 var(--font); padding-right: 26px; border-right: 1.5px solid var(--ink); }
+
+  .pager { position: fixed; right: 16px; bottom: 10px; color: #8a93a8; font: 700 14px var(--font); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="clip" viewBox="0 0 50 130">
+    <path d="M14 40 V104 a11 11 0 0 0 22 0 V22 a15 15 0 0 0 -30 0 V100 a19 19 0 0 0 38 0 V40"
+          fill="none" stroke="#333" stroke-width="2.6" stroke-linecap="round"/>
+  </symbol>
+</svg>
+<div class="deck" id="deck">
+
+  <!-- 1. 표지 -->
+  <section class="slide on">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="cover">
+      <div class="kicker">한국어 음성으로 움직이는 협동로봇</div>
+      <div class="light">말로 시키는 로봇 작업 셀</div>
+      <h1>포스틱</h1>
+      <div class="meta"><span><b>팀명</b>(입력)</span><span><b>발표자</b>(입력)</span><span><b>과정</b>(입력)</span></div>
+    </div>
+  </section>
+
+  <!-- 2. 4열 숫자형 — 어디까지 확인했나 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <h2>어디까지 확인했나</h2><div class="rule"></div>
+    <div class="cols">
+      <div class="col"><div class="dot">0<small>/65</small></div>
+        <h3>위험한 지시 통과</h3><p>막거나 되물어야 할 지시 65개 중 그대로 실행된 것 0개</p></div>
+      <div class="col"><div class="dot">12<small>/12</small></div>
+        <h3>정지 명령</h3><p>"멈춰"는 AI를 거치지 않고 곧바로 정지 경로로</p></div>
+      <div class="col"><div class="dot">2.6<small>초</small></div>
+        <h3>말한 뒤 계획까지</h3><p>봉인 평가 100문장 중앙값 (p90 3.8초)</p></div>
+      <div class="col"><div class="dot">140</div>
+        <h3>화면 자동 검사</h3><p>대시보드 시나리오 140개 전부 통과, 실서버 API 8/8</p></div>
+    </div>
+  </section>
+
+  <!-- 3. 흐름형 — 한 명령의 여정 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <h2>한 명령의 여정</h2><div class="rule"></div>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><div class="label">음성 인식</div><p>한국어 음성을<br>글자로 바꾼다</p></div>
+      <div class="step"><div class="n">02</div><div class="label">AI 계획</div><p>Qwen3-8B가<br>동작 순서를 만든다</p></div>
+      <div class="step"><div class="n">03</div><div class="label">안전 검증</div><p>통과 · 되묻기 · 차단<br>MoveIt 충돌 검사</p></div>
+      <div class="step"><div class="n">04</div><div class="label">작업자 승인</div><p>화면에서 확인하고<br>실행을 누른다</p></div>
+      <div class="step"><div class="n">05</div><div class="label">로봇 실행</div><p>Gazebo의 FR3가<br>집고 옮긴다</p></div>
+    </div>
+    <div class="conclusion"><b>핵심</b><span>말한 것이 바로 움직이지 않는다 — 검증과 사람의 승인을 거친 계획만 실행된다.</span></div>
+  </section>
+
+</div>
+<div class="pager" id="pager"></div>
+<script>
+  const deck = document.getElementById('deck'), slides = [...deck.children], pager = document.getElementById('pager');
+  let i = 0;
+  function fit() { const s = Math.min(innerWidth / 1440, innerHeight / 810); deck.style.transform = `translate(-50%,-50%) scale(${s})`; }
+  function go(n) { i = Math.max(0, Math.min(slides.length - 1, n)); slides.forEach((el, k) => el.classList.toggle('on', k === i)); pager.textContent = `${i + 1} / ${slides.length}`; }
+  addEventListener('resize', fit);
+  addEventListener('keydown', e => { if (['ArrowRight', 'PageDown', ' '].includes(e.key)) go(i + 1); if (['ArrowLeft', 'PageUp'].includes(e.key)) go(i - 1); });
+  addEventListener('click', e => go(e.clientX > innerWidth / 2 ? i + 1 : i - 1));
+  fit(); go(0);
+</script>
+</body>
+</html>

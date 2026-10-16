@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>포스틱 최종 발표</title>
+<style>
+  /* 디자인: 파란색 흰색 심플한 비즈니스 보고서 발표 프레젠테이션.pdf (1440×810) */
+  @font-face { font-family: 'Freesentation'; font-weight: 300; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-3Light.woff2') format('woff2'); }
+  @font-face { font-family: 'Freesentation'; font-weight: 400; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-4Regular.woff2') format('woff2'); }
+  @font-face { font-family: 'Freesentation'; font-weight: 500; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-5Medium.woff2') format('woff2'); }
+  @font-face { font-family: 'Freesentation'; font-weight: 700; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-7Bold.woff2') format('woff2'); }
+  @font-face { font-family: 'Freesentation'; font-weight: 900; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-9Black.woff2') format('woff2'); }
+  :root {
+    --band: #7095f8; --blue: #4165c1; --tint: #eff3ff; --ink: #000; --body: #333; --mute: #777; --grid: #f2f2f2;
+    --font: 'Freesentation', 'Pretendard', 'Malgun Gothic', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #1d2333; overflow: hidden; font-family: var(--font); color: var(--ink); word-break: keep-all; }
+  .deck { position: absolute; left: 50%; top: 50%; width: 1440px; height: 810px; }
+  .slide { position: absolute; inset: 0; display: none; overflow: hidden;
+           background: linear-gradient(var(--grid) 1.5px, transparent 1.5px) 0 0 / 32px 32px,
+                       linear-gradient(90deg, var(--grid) 1.5px, transparent 1.5px) 0 0 / 32px 32px, #fff; }
+  .slide.on { display: block; }
+  .slide::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 140px; background: var(--band); }
+  .card { position: absolute; left: 63px; top: 60px; right: 62px; bottom: 61px; background: #fff; border: 3px solid var(--ink); }
+  .clip { position: absolute; left: 118px; top: 24px; width: 50px; height: 130px; z-index: 2; }
+  .in { position: absolute; left: 63px; top: 60px; right: 62px; bottom: 61px; }  /* 카드 안쪽 좌표계 */
+  h2 { position: absolute; left: 0; right: 0; top: 50px; text-align: center; font: 900 52px/1.2 var(--font); letter-spacing: -.02em; }
+  .rule { position: absolute; left: 183px; right: 183px; top: 156px; height: 1.5px; background: var(--ink); transform-origin: center; }
+  .src { position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font: 400 14px var(--font); color: var(--mute); }
+  .blue { color: var(--blue); }
+  .label { display: inline-block; padding: 9px 22px; background: var(--blue); color: #fff; border: 1.5px solid var(--ink); font: 700 20px/1 var(--font); }
+  .box { background: var(--tint); border: 1.5px solid var(--ink); }
+  .dot { border-radius: 50%; background: var(--blue); color: #fff; display: flex; align-items: center; justify-content: center; }
+
+  /* ── 모션 ── */
+  .slide.on [data-a] { animation: up .7s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--d, 0) * 110ms + 120ms); }
+  .slide.on [data-a="pop"] { animation-name: pop; }
+  .slide.on [data-a="fade"] { animation-name: fade; }
+  .slide.on .rule { animation: grow .8s cubic-bezier(.2,.7,.2,1) both .05s; }
+  @keyframes up { from { opacity: 0; transform: translateY(20px); } }
+  @keyframes pop { 0% { opacity: 0; transform: scale(.6); } 70% { transform: scale(1.06); } }
+  @keyframes fade { from { opacity: 0; } }
+  @keyframes grow { from { transform: scaleX(0); } }
+  .draw { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .slide.on .draw { animation: draw 1.6s cubic-bezier(.4,0,.2,1) forwards; animation-delay: var(--dd, .3s); }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .wave { display: inline-flex; gap: 6px; align-items: center; height: 46px; }
+  .wave i { width: 6px; height: 100%; border-radius: 3px; background: var(--blue); animation: wave 1.1s ease-in-out infinite; }
+  .wave i:nth-child(2) { animation-delay: -.9s; } .wave i:nth-child(3) { animation-delay: -.6s; }
+  .wave i:nth-child(4) { animation-delay: -.3s; } .wave i:nth-child(5) { animation-delay: -.75s; }
+  .wave i:nth-child(6) { animation-delay: -.45s; } .wave i:nth-child(7) { animation-delay: -.15s; }
+  @keyframes wave { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .draw { stroke-dashoffset: 0; } }
+
+  /* 표지·마지막 */
+  .cover { position: absolute; left: 0; right: 0; top: 130px; text-align: center; }
+  .cover .kicker { font: 400 21px/1 var(--font); letter-spacing: .14em; margin-top: 18px; }
+  .cover .light { font: 300 64px/1.15 var(--font); margin-top: 26px; letter-spacing: -.02em; }
+  .cover h1 { font: 900 112px/1.1 var(--font); letter-spacing: -.03em; }
+  .cover .meta { margin: 44px 183px 0; border-top: 1.5px solid var(--ink); display: flex; justify-content: center; gap: 70px; padding-top: 30px; font: 400 19px/1 var(--font); }
+  .cover .meta b { font-weight: 700; margin-right: 14px; }
+
+  /* 목차 */
+  .toc { position: absolute; left: 290px; right: 290px; top: 215px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 70px; row-gap: 14px; }
+  .toc div { display: flex; align-items: center; gap: 18px; padding: 14px 0; border-bottom: 1.5px solid var(--ink); font: 500 25px/1 var(--font); }
+  .toc .dot { width: 44px; height: 44px; font: 700 18px/1 var(--font); flex: none; }
+
+  /* 숫자 3열 */
+  .stats { position: absolute; left: 110px; right: 110px; top: 225px; display: grid; grid-template-columns: repeat(3, 1fr); }
+  .stats > div { text-align: center; padding: 0 30px; }
+  .stats > div + div { border-left: 1.5px solid var(--ink); }
+  .big { font: 900 84px/1 var(--font); letter-spacing: -.03em; }
+  .big small { font-size: 34px; font-weight: 700; margin-left: 4px; }
+  .stats h3 { font: 700 25px/1.3 var(--font); margin-top: 22px; }
+  .stats p { font: 400 19px/1.5 var(--font); color: var(--body); margin-top: 8px; }
+
+  /* 2열 비교 */
+  .two { position: absolute; left: 110px; right: 110px; top: 200px; display: grid; grid-template-columns: 1fr 1fr; }
+  .two > div { padding: 0 50px; text-align: center; }
+  .two > div + div { border-left: 1.5px solid var(--ink); }
+  .two ul { list-style: none; margin: 26px auto 0; text-align: left; display: block; width: fit-content; }
+  .two li { font: 400 23px/1.4 var(--font); padding: 9px 0 9px 30px; position: relative; }
+  .two li::before { content: ""; position: absolute; left: 6px; top: 21px; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
+  .two .muted li { color: var(--mute); } .two .muted li::before { background: #bbb; }
+  .concl { position: absolute; left: 160px; right: 160px; bottom: 50px; padding: 22px 34px; display: flex; align-items: center; gap: 26px; font: 500 25px/1.4 var(--font); }
+  .concl b { flex: none; font: 900 24px/1 var(--font); padding-right: 26px; border-right: 1.5px solid var(--ink); }
+
+  /* 4열 원 */
+  .four { position: absolute; left: 90px; right: 90px; top: 225px; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .four > div { text-align: center; padding: 0 26px; }
+  .four > div + div { border-left: 1.5px solid var(--ink); }
+  .four .dot { width: 136px; height: 136px; margin: 0 auto; flex-direction: column; }
+  .four .dot b { font: 900 44px/1 var(--font); letter-spacing: -.02em; }
+  .four .dot b small { font-size: 21px; font-weight: 500; opacity: .85; }
+  .four .dot > span { font: 500 15px/1 var(--font); letter-spacing: .1em; margin-top: 6px; opacity: .9; }
+  .four h3 { font: 700 25px/1.3 var(--font); margin-top: 26px; }
+  .four p { font: 400 19px/1.5 var(--font); color: var(--body); margin-top: 10px; }
+  .foot { position: absolute; left: 0; right: 0; bottom: 34px; text-align: center; font: 400 17px var(--font); color: var(--mute); }
+
+  /* 사용자 흐름 */
+  .flow { position: absolute; left: 70px; right: 70px; top: 240px; height: 260px; }
+  .flow svg { position: absolute; inset: 0; overflow: visible; }
+  .flow .st { position: absolute; top: 0; width: 190px; margin-left: -95px; text-align: center; }
+  .flow .st .dot { width: 96px; height: 96px; margin: 0 auto; font: 900 30px/1 var(--font); border: 1.5px solid var(--ink); }
+  .flow .st h3 { font: 700 24px/1.2 var(--font); margin-top: 20px; }
+  .flow .st p { font: 400 18px/1.45 var(--font); color: var(--body); margin-top: 8px; }
+  .loop { position: absolute; left: 0; right: 0; bottom: 48px; text-align: center; }
+  .loop span { display: inline-flex; align-items: center; gap: 14px; padding: 14px 30px; font: 500 22px/1 var(--font); }
+
+  /* 시연 */
+  .video { position: absolute; left: calc(50% - 352px); width: 704px; height: 396px; top: 185px; border: 3px solid var(--ink); background: #10141f; overflow: hidden; }
+  .video .ph { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; color: #c8d3f5; font: 500 24px var(--font); }
+  .video .play { width: 86px; height: 86px; border-radius: 50%; border: 3px solid #c8d3f5; display: grid; place-items: center; }
+  .video .play::after { content: ""; border-left: 26px solid #c8d3f5; border-top: 16px solid transparent; border-bottom: 16px solid transparent; margin-left: 8px; }
+  .video video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+  .chips { position: absolute; left: 0; right: 0; bottom: 40px; display: flex; justify-content: center; gap: 18px; }
+  .chips span { padding: 11px 22px; font: 700 20px/1 var(--font); }
+
+  /* 막대 그래프 */
+  .bars { position: absolute; left: 110px; width: 560px; top: 225px; }
+  .bars .row { margin-bottom: 34px; }
+  .bars .hd { display: flex; justify-content: space-between; font: 700 22px/1 var(--font); margin-bottom: 12px; }
+  .bars .hd em { font-style: normal; color: var(--mute); font-weight: 500; font-size: 18px; }
+  .bars .track { position: relative; height: 34px; background: #f1f3f8; border: 1.5px solid var(--ink); }
+  .bars .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--blue); transition: width 1.3s cubic-bezier(.2,.7,.2,1); }
+  .slide.on .bars .fill { width: var(--w); }
+  .bars .fill b { position: absolute; right: -66px; top: 50%; transform: translateY(-50%); font: 900 22px var(--font); color: var(--ink); }
+  .bars .goal { position: absolute; top: -8px; bottom: -8px; width: 0; border-left: 3px dashed #d0342c; }
+
+  .why { position: absolute; right: 100px; width: 430px; top: 205px; padding: 30px 32px; }
+  .why h3 { font: 900 25px/1.2 var(--font); }
+  .why q { display: block; margin-top: 18px; font: 500 21px/1.5 var(--font); quotes: "“" "”"; }
+  .why p { margin-top: 18px; font: 400 19px/1.55 var(--font); color: var(--body); }
+  .why .ok { margin-top: 22px; padding-top: 18px; border-top: 1.5px solid var(--ink); font: 700 21px/1.4 var(--font); }
+
+  /* 구성도 */
+  .arch { position: absolute; inset: 180px 80px 40px; }
+  .arch svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .node { position: absolute; width: 300px; padding: 20px 24px; background: #fff; border: 2px solid var(--ink); text-align: center; }
+  .node.core { background: var(--tint); }
+  .node h3 { font: 900 24px/1.2 var(--font); }
+  .node p { font: 400 18px/1.5 var(--font); color: var(--body); margin-top: 8px; }
+  .node .tag { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); padding: 4px 12px; background: var(--blue); color: #fff; font: 700 14px/1 var(--font); white-space: nowrap; }
+
+  /* 트러블 2×2 */
+  .tr { position: absolute; left: 110px; right: 110px; top: 200px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px 30px; }
+  .tr > div { border: 1.5px solid var(--ink); padding: 22px 26px; background: #fff; }
+  .tr .k { display: inline-block; padding: 6px 12px; font: 700 15px/1 var(--font); background: var(--blue); color: #fff; }
+  .tr .k.fe { background: #fff; color: var(--blue); border: 1.5px solid var(--blue); }
+  .tr h4 { font: 700 22px/1.35 var(--font); margin-top: 14px; }
+  .tr p { font: 500 20px/1.4 var(--font); color: var(--blue); margin-top: 10px; }
+  .tr p::before { content: "→ "; font-weight: 900; }
+
+  /* 목록형(향후·기대효과) */
+  .list { position: absolute; left: 150px; right: 150px; top: 200px; }
+  .list > div { display: grid; grid-template-columns: 56px 230px 1fr 24px; align-items: center; padding: 19px 0; border-bottom: 1.5px solid var(--ink); }
+  .list .dot { width: 38px; height: 38px; font: 700 16px/1 var(--font); }
+  .list h3 { font: 700 24px/1 var(--font); }
+  .list p { font: 400 21px/1.35 var(--font); color: var(--body); }
+  .list i { font: 400 30px/1 var(--font); font-style: normal; }
+  .check { width: 38px; height: 38px; }
+
+  /* 팀 */
+  .team { position: absolute; left: 170px; right: 170px; top: 220px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+  .team > div { text-align: center; }
+  .team .dot { width: 128px; height: 128px; margin: 0 auto; font: 900 40px/1 var(--font); border: 1.5px solid var(--ink); }
+  .team h3 { font: 700 24px/1.2 var(--font); margin-top: 20px; }
+  .team .label { margin-top: 12px; font-size: 16px; padding: 7px 14px; }
+  .team p { font: 500 17px/1 var(--font); color: var(--mute); margin-top: 22px; letter-spacing: .1em; }
+  .team h3 { margin-top: 10px; }
+  .team .label { margin-top: 14px; }
+
+  /* 목표 vs 실측 */
+  .gt { position: absolute; left: 150px; right: 150px; top: 215px; }
+  .gt > div { display: grid; grid-template-columns: 1.1fr 1.2fr 1.2fr 110px; align-items: center; padding: 22px 10px; border-bottom: 1.5px solid var(--ink); font: 400 22px/1.3 var(--font); }
+  .gt .hd { padding: 12px 10px; font: 700 17px/1 var(--font); color: var(--mute); border-bottom-width: 2.5px; }
+  .gt b { font-weight: 700; font-size: 23px; }
+  .gt strong { font: 900 28px/1.2 var(--font); color: var(--blue); }
+  .gt > div:last-child strong { font-size: 22px; font-weight: 700; }
+  .gt em { font: 700 16px/1 var(--font); font-style: normal; text-align: center; padding: 8px 0; border: 1.5px solid; }
+  .gt .y { color: #fff; background: var(--blue); border-color: var(--ink); }
+  .gt .n { color: #d0342c; }
+  .gt .m { color: var(--mute); }
+
+  .progress { position: fixed; left: 0; top: 0; height: 4px; background: var(--band); transition: width .4s; z-index: 5; }
+  .pager { position: fixed; right: 16px; bottom: 10px; color: #8a93a8; font: 700 14px var(--font); z-index: 5; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="clip" viewBox="0 0 50 130">
+    <path d="M14 40 V104 a11 11 0 0 0 22 0 V22 a15 15 0 0 0 -30 0 V100 a19 19 0 0 0 38 0 V40" fill="none" stroke="#333" stroke-width="2.6" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="chk" viewBox="0 0 38 38"><circle cx="19" cy="19" r="19" fill="#4165c1"/><path d="M11 19.5l5.5 5.5L27 14" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+  <!-- 1. 표지 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="cover">
+      <div class="wave" data-a="fade"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="kicker" data-a style="--d:1">한국어 음성으로 움직이는 협동로봇</div>
+      <div class="light" data-a style="--d:2">말로 시키는 로봇 작업 셀</div>
+      <h1 data-a style="--d:3">포스틱</h1>
+      <div class="meta" data-a style="--d:5"><span><b>팀명</b>FORSTICK</span><span><b>발표자</b>(입력)</span></div>
+    </div>
+  </section>
+
+  <!-- 2. 목차 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>목 차</h2><div class="rule"></div>
+      <div class="toc">
+        <div data-a style="--d:1"><span class="dot">01</span>기획 배경</div>
+        <div data-a style="--d:5"><span class="dot">05</span>검증 결과</div>
+        <div data-a style="--d:2"><span class="dot">02</span>서비스 소개</div>
+        <div data-a style="--d:6"><span class="dot">06</span>기술 구성 · 트러블슈팅</div>
+        <div data-a style="--d:3"><span class="dot">03</span>사용자 흐름</div>
+        <div data-a style="--d:7"><span class="dot">07</span>향후 발전 방향</div>
+        <div data-a style="--d:4"><span class="dot">04</span>시연</div>
+        <div data-a style="--d:8"><span class="dot">08</span>기대 효과</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 기획 배경 ① -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>로봇은 이미 많다</h2><div class="rule"></div>
+      <div class="stats">
+        <div data-a style="--d:1"><div class="big blue"><span class="count" data-to="1220" data-comma>0</span><small>대</small></div>
+          <h3>한국 로봇 밀도 세계 1위</h3><p>제조업 근로자 1만 명당</p></div>
+        <div data-a style="--d:2"><div class="big blue"><span class="count" data-to="62">0</span><small>만 대</small></div>
+          <h3>2025년 세계 신규 설치</h3><p>전년보다 약 15% 증가</p></div>
+        <div data-a style="--d:3"><div class="big blue"><span class="count" data-to="97.9" data-dec="1">0</span><small>%</small></div>
+          <h3>국내 로봇 기업 중 중소기업</h3><p>소프트웨어·통합 역량은 보완 필요</p></div>
+      </div>
+      <div class="src" data-a="fade" style="--d:5">출처: IFR World Robotics 2025 · IFR 2026.06 잠정 집계 · 산업연구원(KIET) 2026.09</div>
+    </div>
+  </section>
+
+  <!-- 4. 기획 배경 ② -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>문제는 ‘바꾸는 일’</h2><div class="rule"></div>
+      <div class="two">
+        <div data-a style="--d:1"><span class="label">작업이 바뀔 때마다</span>
+          <ul><li>티칭펜던트로 다시 설정</li><li>좌표·동작 조건 전문지식 필요</li><li>비전문가는 손대기 어려움</li></ul></div>
+        <div data-a style="--d:2"><span class="label">AI에게 맡기면?</span>
+          <ul><li>말은 알아듣는다</li><li>하지만 출력은 확률적</li><li>잘못 이해하면 그대로 움직인다</li></ul></div>
+      </div>
+      <div class="concl box" data-a style="--d:4"><b>핵심</b><span>AI가 이해했다 ≠ 안전하게 실행할 수 있다</span></div>
+    </div>
+  </section>
+
+  <!-- 5. 서비스 소개 ① -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>포스틱은</h2><div class="rule"></div>
+      <div class="two">
+        <div class="muted" data-a style="--d:1"><span class="label" style="background:#fff;color:#000">기존 방식</span>
+          <ul><li>전문가가 다시 프로그래밍</li><li>바뀔 때마다 외부 지원</li><li>왜 멈췄는지 알기 어려움</li></ul></div>
+        <div data-a style="--d:2"><span class="label">포스틱</span>
+          <ul><li>한국어로 말하면 계획이 생긴다</li><li>작업자가 보고 승인한다</li><li>모든 판정에 이유가 남는다</li></ul></div>
+      </div>
+      <div class="concl box" data-a style="--d:4"><b>원칙</b><span>AI는 계획만 세우고, 실행 허가는 <b style="border:0;padding:0;font:inherit;font-weight:900" class="blue">검증과 사람</b>이 한다</span></div>
+    </div>
+  </section>
+
+  <!-- 6. 서비스 소개 ② -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>판정은 셋, 정지는 하나</h2><div class="rule"></div>
+      <div class="four">
+        <div data-a style="--d:1"><div class="dot" data-a="pop" style="--d:2"><b>통과</b><span>PASS</span></div>
+          <h3>바로 승인 대기</h3><p>검증을 모두 통과한 계획</p></div>
+        <div data-a style="--d:2"><div class="dot" data-a="pop" style="--d:3"><b>되묻기</b><span>ASK</span></div>
+          <h3>정보가 모자라면</h3><p>“어떤 자재를 옮길까요?”</p></div>
+        <div data-a style="--d:3"><div class="dot" data-a="pop" style="--d:4"><b>차단</b><span>BLOCK</span></div>
+          <h3>위험·불가하면</h3><p>이유와 함께 막는다</p></div>
+        <div data-a style="--d:4"><div class="dot" data-a="pop" style="--d:5;background:#d0342c"><b>정지</b><span>STOP</span></div>
+          <h3>“멈춰” 한마디</h3><p>AI를 거치지 않고 즉시</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 사용자 흐름 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>말 한마디가 동작이 되기까지</h2><div class="rule"></div>
+      <div class="flow">
+        <svg viewBox="0 0 1176 260" preserveAspectRatio="none">
+          <line class="draw" pathLength="1" x1="98" y1="48" x2="1078" y2="48" stroke="#000" stroke-width="1.5" style="--dd:.2s"/>
+          <circle r="7" fill="#7095f8"><animateMotion dur="5s" repeatCount="indefinite" path="M98 48 H1078"/></circle>
+        </svg>
+        <div class="st" style="left:8.33%"><div class="dot" data-a="pop" style="--d:1">1</div><h3 data-a style="--d:1">로그인</h3><p data-a style="--d:1">구글 계정</p></div>
+        <div class="st" style="left:25%"><div class="dot" data-a="pop" style="--d:2">2</div><h3 data-a style="--d:2">명령</h3><p data-a style="--d:2">음성 또는 텍스트</p></div>
+        <div class="st" style="left:41.67%"><div class="dot" data-a="pop" style="--d:3">3</div><h3 data-a style="--d:3">판정 카드</h3><p data-a style="--d:3">통과·되묻기·차단</p></div>
+        <div class="st" style="left:58.33%"><div class="dot" data-a="pop" style="--d:4">4</div><h3 data-a style="--d:4">승인</h3><p data-a style="--d:4">계획 확인 후 실행</p></div>
+        <div class="st" style="left:75%"><div class="dot" data-a="pop" style="--d:5">5</div><h3 data-a style="--d:5">실행 관찰</h3><p data-a style="--d:5">3D·시뮬레이션 화면</p></div>
+        <div class="st" style="left:91.67%"><div class="dot" data-a="pop" style="--d:6">6</div><h3 data-a style="--d:6">기록</h3><p data-a style="--d:6">명령·판정·결과</p></div>
+      </div>
+      <div class="loop" data-a style="--d:8"><span class="box">⟲ &nbsp;어느 단계에서든 <b class="blue">즉시 정지</b> · 확인 후 재개</span></div>
+    </div>
+  </section>
+
+  <!-- 8. 시연 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>시연</h2><div class="rule"></div>
+      <div class="video" data-a style="--d:1">
+        <div class="ph"><div class="play"></div>시연 영상 (시연.mp4)</div>
+        <video id="demo" controls preload="metadata" playsinline><source src="시연.mp4" type="video/mp4" onerror="this.parentNode.remove()"></video>
+      </div>
+      <div class="chips">
+        <span class="box" data-a style="--d:3">① 정상 이송</span>
+        <span class="box" data-a style="--d:4">② 되묻기</span>
+        <span class="box" data-a style="--d:5">③ 차단</span>
+        <span class="box" data-a style="--d:6">④ 즉시 정지</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. 검증 결과 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>어디까지 확인했나</h2><div class="rule"></div>
+      <div class="four">
+        <div data-a style="--d:1"><div class="dot" data-a="pop" style="--d:2"><b><span class="count" data-to="0">0</span><small>/65</small></b></div>
+          <h3>위험한 지시 통과</h3><p>막거나 되물어야 할 65개 중<br>실행된 것 0개</p></div>
+        <div data-a style="--d:2"><div class="dot" data-a="pop" style="--d:3"><b><span class="count" data-to="12">0</span><small>/12</small></b></div>
+          <h3>정지 명령</h3><p>모델을 거치지 않고<br>전부 정지 경로로</p></div>
+        <div data-a style="--d:3"><div class="dot" data-a="pop" style="--d:4"><b><span class="count" data-to="2.65" data-dec="2">0</span><small>초</small></b></div>
+          <h3>말한 뒤 계획까지</h3><p>중앙값 · 90%는 3.8초 안</p></div>
+        <div data-a style="--d:4"><div class="dot" data-a="pop" style="--d:5"><b><span class="count" data-to="140">0</span></b></div>
+          <h3>화면 자동 검사</h3><p>140개 전부 통과<br>실서버 API 8/8</p></div>
+      </div>
+      <div class="foot" data-a="fade" style="--d:6">봉인 평가 100문장 · 실제 Qwen3-8B + MoveIt · Gazebo 시뮬레이션 기준 (2026.10.08)</div>
+    </div>
+  </section>
+
+  <!-- 10. 아직 부족한 점 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>틀려도, 안전한 쪽으로</h2><div class="rule"></div>
+      <div class="bars">
+        <div class="row" data-a style="--d:1"><div class="hd">정상 지시를 잘못 막음 <em>목표 10% 이하</em></div>
+          <div class="track"><div class="fill" style="--w:17.1%;transition-delay:.4s"><b>17.1%</b></div><div class="goal" style="left:10%"></div></div></div>
+        <div class="row" data-a style="--d:2"><div class="hd">정상 지시를 되물음 <em>목표 15% 이하</em></div>
+          <div class="track"><div class="fill" style="--w:22.9%;transition-delay:.6s"><b>22.9%</b></div><div class="goal" style="left:15%"></div></div></div>
+        <div class="row" data-a style="--d:3"><div class="hd">애매한 지시를 되물음 <em>목표 80% 이상</em></div>
+          <div class="track"><div class="fill" style="--w:65.6%;transition-delay:.8s"><b>65.6%</b></div><div class="goal" style="left:80%"></div></div></div>
+      </div>
+      <div class="why box" data-a style="--d:4">
+        <h3>원인을 찾았다</h3>
+        <q>1번 팔레트에 가 있어</q><q style="margin-top:6px">원위치로 돌아가 있어</q>
+        <p>위치 이동을 ‘자재 옮기기’로 잘못 해석</p>
+        <div class="ok">되묻거나 막을 뿐,<br><span class="blue">엉뚱하게 움직이지는 않는다</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. 기술 구성 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>기술 구성</h2><div class="rule"></div>
+      <div class="arch">
+        <svg viewBox="0 0 1154 470" preserveAspectRatio="none">
+          <path id="p1" class="draw" pathLength="1" d="M300 230 H427" stroke="#000" stroke-width="2" fill="none" style="--dd:.5s"/>
+          <path id="p2" class="draw" pathLength="1" d="M727 200 C790 200 790 90 854 90" stroke="#000" stroke-width="2" fill="none" style="--dd:.7s"/>
+          <path id="p3" class="draw" pathLength="1" d="M727 260 C790 260 790 370 854 370" stroke="#000" stroke-width="2" fill="none" style="--dd:.9s"/>
+          <circle r="7" fill="#7095f8"><animateMotion dur="2.4s" repeatCount="indefinite" keyPoints="0;1;0" keyTimes="0;.5;1" calcMode="linear"><mpath href="#p1"/></animateMotion></circle>
+          <circle r="7" fill="#7095f8"><animateMotion dur="2.4s" begin=".6s" repeatCount="indefinite" keyPoints="0;1;0" keyTimes="0;.5;1" calcMode="linear"><mpath href="#p2"/></animateMotion></circle>
+          <circle r="7" fill="#4165c1"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" keyPoints="0;1;0" keyTimes="0;.5;1" calcMode="linear"><mpath href="#p3"/></animateMotion></circle>
+        </svg>
+        <div class="node" data-a style="left:0;top:160px;--d:1"><span class="tag">FRONTEND</span><h3>작업자 화면</h3><p>React · Vite · Three.js<br>음성 입력 · 3D 작업 셀</p></div>
+        <div class="node core" data-a style="left:427px;top:150px;--d:0"><span class="tag">BACKEND</span><h3>계획 · 검증 서버</h3><p>Python ASGI · WebSocket<br>안전 규칙 · SQLite 기록</p></div>
+        <div class="node" data-a style="left:854px;top:20px;--d:2"><span class="tag">AI · GPU 서버</span><h3>음성 · 언어 모델</h3><p>faster-whisper<br>vLLM · Qwen3-8B</p></div>
+        <div class="node" data-a style="left:854px;top:300px;--d:3"><span class="tag">ROBOT · SIM</span><h3>로봇 작업 셀</h3><p>ROS 2 · MoveIt 2 · Gazebo<br>FR3 + 2F-85 그리퍼</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. 트러블슈팅 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>부딪히고, 고친 것</h2><div class="rule"></div>
+      <div class="tr">
+        <div data-a style="--d:1"><span class="k">BACKEND</span><h4>줄임말에서 출발지·목적지가 뒤바뀜</h4><p>하나의 검증된 작업 의도로 통일</p></div>
+        <div data-a style="--d:2"><span class="k">BACKEND</span><h4>“멈춰”도 AI 모델을 거쳐 감</h4><p>정지 발화는 모델 없이 즉시 정지</p></div>
+        <div data-a style="--d:3"><span class="k fe">FRONTEND</span><h4>응답이 없어도 화면은 ‘정상’</h4><p>확인 안 된 상태는 ‘확인 안 됨’으로</p></div>
+        <div data-a style="--d:4"><span class="k fe">FRONTEND</span><h4>파일 하나 빠지자 화면 전체가 멈춤</h4><p>모듈 의존 정리, 초기 로딩 복구</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. 향후 발전 방향 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>시뮬레이션에서 현장으로</h2><div class="rule"></div>
+      <div class="list">
+        <div data-a style="--d:1"><span class="dot">01</span><h3>해석 정확도</h3><p>위치 이동 표현 개선 → 오차단 10% 이하</p><i>›</i></div>
+        <div data-a style="--d:2"><span class="dot">02</span><h3>실물 로봇</h3><p>실제 FR3 연동 · 하드웨어 비상정지 연계</p><i>›</i></div>
+        <div data-a style="--d:3"><span class="dot">03</span><h3>데이터 통합</h3><p>여러 작업 셀 기록을 PostgreSQL로</p><i>›</i></div>
+        <div data-a style="--d:4"><span class="dot">04</span><h3>로봇 확장</h3><p>FR3 외 다양한 로봇 모델 적용</p><i>›</i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14. 기대 효과 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>누구나 말로, 하지만 안전하게</h2><div class="rule"></div>
+      <div class="list">
+        <div data-a style="--d:1"><svg class="check"><use href="#chk"/></svg><h3>진입장벽 완화</h3><p>티칭펜던트 대신 말로 작업 지시</p><i>›</i></div>
+        <div data-a style="--d:2"><svg class="check"><use href="#chk"/></svg><h3>실행 전 위험 차단</h3><p>잘못된 지시는 로봇에 닿기 전에 걸러진다</p><i>›</i></div>
+        <div data-a style="--d:3"><svg class="check"><use href="#chk"/></svg><h3>설명 가능한 판정</h3><p>왜 막혔는지 이유 코드로 바로 확인</p><i>›</i></div>
+        <div data-a style="--d:4"><svg class="check"><use href="#chk"/></svg><h3>교육 활용</h3><p>실물 로봇 없이 계획·검증 원리를 실습</p><i>›</i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15. 기대 효과 — 목표와 실측 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>목표와 실측</h2><div class="rule"></div>
+      <div class="gt">
+        <div class="hd" data-a style="--d:1"><span>항목</span><span>기획 목표</span><span>실측</span><span></span></div>
+        <div data-a style="--d:2"><b>위험 지시 실행 통과</b><span>0건</span><strong><span class="count" data-to="0">0</span> / 65</strong><em class="y">달성</em></div>
+        <div data-a style="--d:3"><b>정상 지시 오차단</b><span>10% 이하</span><strong><span class="count" data-to="17.1" data-dec="1">0</span>%</strong><em class="n">개선 중</em></div>
+        <div data-a style="--d:4"><b>응답 시간</b><span>판정 표시까지 p95 5초</span><strong>계획까지 p90 3.8초</strong><em class="m">참고</em></div>
+      </div>
+      <div class="foot" data-a="fade" style="--d:6">봉인 평가 100문장 · 시뮬레이션 기준 (2026.10.08) · 응답 시간은 측정 구간이 달라 참고값</div>
+    </div>
+  </section>
+
+  <!-- 16. 팀원 소개 -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="in">
+      <h2 data-a>팀원 소개 및 역할</h2><div class="rule"></div>
+      <div class="team">
+        <div data-a style="--d:1"><div class="dot" data-a="pop" style="--d:2">손</div><p>팀장</p><h3>손대호</h3><span class="label">프론트엔드</span></div>
+        <div data-a style="--d:2"><div class="dot" data-a="pop" style="--d:3">김</div><p>팀원</p><h3>김예은</h3><span class="label">PM</span></div>
+        <div data-a style="--d:3"><div class="dot" data-a="pop" style="--d:4">김</div><p>팀원</p><h3>김남수</h3><span class="label">백엔드 · DB</span></div>
+        <div data-a style="--d:4"><div class="dot" data-a="pop" style="--d:5">이</div><p>팀원</p><h3>이윤예</h3><span class="label">문서</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17. Thank you · Q&A -->
+  <section class="slide">
+    <div class="card"></div><svg class="clip"><use href="#clip"/></svg>
+    <div class="cover" style="top:170px">
+      <div class="wave" data-a="fade"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="light" data-a style="--d:1;font-size:92px;margin-top:20px">Thank You</div>
+      <h1 data-a style="--d:2;font-size:88px">질문 받겠습니다</h1>
+      <div class="meta" data-a style="--d:4"><span><b>포스틱</b>말로 시키는 로봇 작업 셀</span></div>
+    </div>
+  </section>
+
+</div>
+<div class="pager" id="pager"></div>
+<script>
+  const deck = document.getElementById('deck'), slides = [...deck.children];
+  const pager = document.getElementById('pager'), progress = document.getElementById('progress');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let i = 0;
+  function fit() { const s = Math.min(innerWidth / 1440, innerHeight / 810); deck.style.transform = `translate(-50%,-50%) scale(${s})`; }
+  function fmt(v, el) { const d = +(el.dataset.dec || 0); const t = v.toFixed(d); return 'comma' in el.dataset ? (+t).toLocaleString('en-US') : t; }
+  function countUp(root) {
+    root.querySelectorAll('.count').forEach(el => {
+      const to = +el.dataset.to, t0 = performance.now(), dur = 1300;
+      if (reduce || !to) { el.textContent = fmt(to, el); return; }
+      (function tick(now) { const p = Math.min(1, (now - t0 - 350) / dur), e = 1 - Math.pow(1 - Math.max(0, p), 3);
+        el.textContent = fmt(to * e, el); if (p < 1) requestAnimationFrame(tick); })(t0);
+    });
+  }
+  function go(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((el, k) => el.classList.toggle('on', k === i));
+    countUp(slides[i]);
+    const v = document.getElementById('demo'); if (v && !slides[i].contains(v)) v.pause();
+    pager.textContent = `${i + 1} / ${slides.length}`;
+    progress.style.width = `${(i + 1) / slides.length * 100}%`;
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+  addEventListener('resize', fit);
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(i + 1); }
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) go(i - 1);
+    if (e.key === 'Home') go(0); if (e.key === 'End') go(slides.length - 1);
+    if (e.key === 'f') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  });
+  addEventListener('click', e => { if (e.target.closest('video')) return; go(e.clientX > innerWidth / 2 ? i + 1 : i - 1); });
+  fit(); go((parseInt(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>

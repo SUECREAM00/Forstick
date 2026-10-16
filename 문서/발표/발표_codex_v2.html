@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FORSTICK | 최종 발표</title>
+  <style>
+    :root{--ink:#0d1530;--ink2:#18223f;--paper:#f2f5f0;--white:#fbfffb;--cyan:#32d4cc;--cyan-deep:#087e80;--orange:#ff8b61;--muted:#8e9ab3;--line:rgba(244,255,250,.22)}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;overflow:hidden}
+    body{background:#050914;color:var(--white);font-family:Pretendard,"Noto Sans KR","Malgun Gothic",Arial,sans-serif;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:break-word}
+    button{font:inherit}
+    #stage{position:absolute;left:50%;top:50%;width:1440px;height:810px;overflow:hidden;transform-origin:center center;background:var(--ink);box-shadow:0 30px 90px rgba(0,0,0,.55)}
+    .slide{position:absolute;inset:0;padding:65px 88px 84px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .48s ease,visibility .48s;overflow:hidden}
+    .slide.active{opacity:1;visibility:visible;pointer-events:auto}
+    .dark{background:var(--ink);color:var(--white)}
+    .light{background:var(--paper);color:var(--ink)}
+    .slide:after{content:"";position:absolute;right:-120px;bottom:-250px;width:720px;height:720px;border:1px solid currentColor;border-radius:50%;opacity:.045;pointer-events:none}
+    .slide>*{position:relative;z-index:1}
+    .eyebrow{margin:0 0 24px;color:var(--cyan);font-size:17px;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
+    .light .eyebrow{color:var(--cyan-deep)}
+    h1,h2,h3,p{margin-top:0}
+    h1{font-size:96px;line-height:1.04;letter-spacing:-.06em;margin-bottom:24px}
+    h2{font-size:62px;line-height:1.13;letter-spacing:-.055em;margin-bottom:18px}
+    h3{font-size:28px;line-height:1.25;letter-spacing:-.03em}
+    p{font-size:27px;line-height:1.48;letter-spacing:-.025em}
+    .sub{font-size:30px;line-height:1.5;max-width:1050px}
+    .muted{color:var(--muted)}
+    .light .muted{color:#5a6b6e}
+    .source{position:absolute;left:88px;bottom:96px;font-size:15px;color:var(--muted);letter-spacing:0;max-width:1210px}
+    .light .source{color:#667779}
+    .accent{color:var(--cyan)}
+    .warm{color:var(--orange)}
+    .light .accent{color:var(--cyan-deep)}
+    .reveal{opacity:0;transform:translateY(25px)}
+    .active .reveal{animation:enter .65s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--delay,0s)}
+    @keyframes enter{to{opacity:1;transform:translateY(0)}}
+    .rule{height:1px;background:currentColor;opacity:.2}
+    .light .rule{opacity:.18}
+    .big-num{font-family:Arial,"Malgun Gothic",sans-serif;font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:-.075em}
+    #chrome{position:absolute;z-index:20;left:0;right:0;bottom:0;height:64px;padding:0 52px;display:flex;align-items:center;gap:24px;color:var(--white);pointer-events:none;transition:color .4s}
+    #stage.on-light #chrome{color:var(--ink)}
+    #chrome .brand{font-weight:900;letter-spacing:.12em;font-size:14px}
+    #chrome .progress{height:2px;flex:1;background:currentColor;opacity:.15;position:relative}
+    #chrome .progress i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--cyan);transition:width .45s ease;opacity:1}
+    #chrome .count{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+    #chrome .controls{display:flex;gap:6px;pointer-events:auto}
+    #chrome button{width:36px;height:36px;border:1px solid currentColor;color:inherit;background:transparent;border-radius:50%;cursor:pointer;font-size:18px;line-height:1}
+    #chrome button:hover,#chrome button:focus-visible{background:var(--cyan);color:var(--ink);border-color:var(--cyan);outline:none}
+    #chrome button:disabled{opacity:.25;cursor:default;background:transparent;color:inherit;border-color:currentColor}
+    .corner-index{position:absolute;right:90px;top:70px;font-size:16px;letter-spacing:.18em;font-weight:800;opacity:.55}
+
+    /* 01 — opening signal */
+    .hero{padding-top:117px}
+    .hero .eyebrow{margin-bottom:43px}
+    .hero h1{font-family:Arial,"Malgun Gothic",sans-serif;font-size:164px;letter-spacing:-.095em;margin-left:-9px;margin-bottom:12px}
+    .hero .subtitle{font-size:38px;letter-spacing:-.045em}
+    .hero .speaker{position:absolute;left:88px;bottom:133px;font-size:22px}
+    .hero .speaker span{color:var(--muted);margin-right:16px}
+    .hero .orbit{position:absolute;right:-123px;top:-86px;width:640px;height:640px;border-radius:50%;border:2px solid rgba(50,212,204,.45);z-index:0}
+    .hero .orbit:before,.hero .orbit:after{content:"";position:absolute;border:1px solid rgba(50,212,204,.32);border-radius:50%}
+    .hero .orbit:before{inset:79px}.hero .orbit:after{inset:177px}
+    .hero .orbit .dot{position:absolute;top:116px;left:78px;width:19px;height:19px;border-radius:50%;background:var(--cyan);box-shadow:0 0 32px var(--cyan)}
+    .hero.active .orbit{animation:orbit-in 1.15s ease-out both}
+    @keyframes orbit-in{from{opacity:0;transform:scale(.8) rotate(-16deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+    .hero .line-signal{position:absolute;left:0;right:0;bottom:212px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);transform-origin:left;opacity:.55}
+    .hero.active .line-signal{animation:draw .95s ease .45s both}
+    @keyframes draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+    /* 02 — agenda */
+    .agenda h2{margin-bottom:75px}
+    .agenda-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:23px;position:relative}
+    .agenda-grid:before{content:"";position:absolute;top:56px;left:4%;right:4%;height:2px;background:#c6d6d1}
+    .agenda-item{padding-top:0}
+    .agenda-item .n{position:relative;display:block;font-size:80px;line-height:1;font-weight:900;letter-spacing:-.08em;color:#d2e1dc;margin-bottom:32px}
+    .agenda-item .n:after{content:"";position:absolute;bottom:-12px;left:0;width:11px;height:11px;border-radius:50%;background:var(--cyan-deep)}
+    .agenda-item strong{display:block;font-size:26px;margin-bottom:12px;line-height:1.25}
+    .agenda-item small{display:block;font-size:19px;color:#647376;line-height:1.42}
+
+    /* 03 — problem */
+    .problem .giant{position:absolute;left:76px;top:196px;font-size:90px;line-height:1.18;font-weight:900;letter-spacing:-.075em}
+    .problem .right-story{position:absolute;right:85px;top:214px;width:410px;border-left:2px solid var(--cyan);padding:4px 0 0 35px}
+    .problem .right-story p{font-size:30px;line-height:1.44;margin-bottom:29px}
+    .problem .right-story p:last-child{margin:0}
+    .problem .caveat{position:absolute;left:88px;bottom:143px;font-size:20px;color:var(--muted)}
+    .problem .bridge{position:absolute;left:650px;top:368px;width:195px;height:2px;background:var(--cyan);transform-origin:left}
+    .problem .bridge:after{content:"";position:absolute;right:0;top:-5px;width:11px;height:11px;border-right:2px solid var(--cyan);border-top:2px solid var(--cyan);transform:rotate(45deg)}
+    .problem.active .bridge{animation:draw .7s ease .5s both}
+
+    /* 04 — service */
+    .service .topline{width:1050px}
+    .service-wrap{display:grid;grid-template-columns:400px 1fr;gap:56px;align-items:start;margin-top:30px}
+    .service-copy{font-size:39px;font-weight:800;line-height:1.35;letter-spacing:-.05em}
+    .service-copy em{font-style:normal;color:var(--cyan-deep)}
+    .decision-words{display:flex;gap:14px;margin-top:40px;font-size:18px;font-weight:900;letter-spacing:.06em}
+    .decision-words span{padding-bottom:6px;border-bottom:3px solid currentColor}
+    .decision-words span:nth-child(1){color:#087e80}.decision-words span:nth-child(2){color:#aa6a19}.decision-words span:nth-child(3){color:#b14832}
+    .screen-shot{position:relative;margin:0;background:#081017;border-radius:9px;padding:14px 14px 30px;box-shadow:0 25px 53px rgba(4,27,31,.2)}
+    .screen-shot:before{content:"";display:block;height:14px;background:radial-gradient(circle at 8px 7px,#ff8b61 3px,transparent 4px),radial-gradient(circle at 23px 7px,#f6c665 3px,transparent 4px),radial-gradient(circle at 38px 7px,#32d4cc 3px,transparent 4px);margin-bottom:8px}
+    .screen-shot img{display:block;width:100%;height:auto;background:#e4e9f0}
+    .service-wrap{position:relative}
+    .sim-inset{position:absolute;right:-26px;bottom:-118px;width:330px;margin:0;padding:8px 8px 26px;background:#fff;border-radius:8px;box-shadow:0 18px 40px rgba(4,15,40,.28)}
+    .sim-inset img{display:block;width:100%;border-radius:4px}
+    .sim-inset figcaption{position:absolute;left:12px;bottom:6px;font-size:13px;color:#5d6880}
+    .service.active .sim-inset{animation:float-in .8s cubic-bezier(.2,.8,.2,1) .55s both}
+    @keyframes float-in{from{opacity:0;transform:translate(30px,30px) rotate(3deg)}to{opacity:1;transform:none}}
+    .screen-shot figcaption{font-size:15px;color:#aab4c9;position:absolute;left:18px;bottom:7px}
+
+    /* 05 — full cycle */
+    .flow .sub{margin-bottom:30px}
+    .flow h2{margin-bottom:8px}
+    .cycle{position:relative;display:grid;grid-template-columns:150px repeat(6,1fr);column-gap:16px;row-gap:12px;align-items:stretch}
+    .cycle .flow-step{min-height:0;padding:18px 4px 10px 0}
+    .cycle .flow-step strong{font-size:26px}
+    .cycle .flow-step b{margin-bottom:10px}
+    .lane-label{grid-column:1;display:flex;flex-direction:column;justify-content:center;font:900 22px/1.1 Arial,sans-serif;letter-spacing:.04em}
+    .lane-label em{font:600 16px/1.2 Pretendard,'Malgun Gothic',sans-serif;font-style:normal;color:#a3aec4;margin-top:6px;letter-spacing:0}
+    .lane-label.ask{color:#f5c86f}.lane-label.block{color:var(--orange)}.lane-label.stop{color:#ff5d6c}
+    .chip{display:block;padding:10px 13px;border-left:4px solid;background:rgba(255,255,255,.05);font-size:16.5px;line-height:1.4;color:#dfe5f2}
+    .chip.ask{border-color:#f5c86f}.chip.block{border-color:var(--orange)}.chip.stop{border-color:#ff5d6c}
+    .stop-span{grid-column:3/8;align-self:center;border-top:2px dashed rgba(255,93,108,.55);padding-top:10px;font-size:17px;color:#c3cade}
+    .pulse{position:absolute;top:-7px;left:166px;width:13px;height:13px;border-radius:50%;background:#fff;box-shadow:0 0 18px var(--cyan),0 0 4px #fff;pointer-events:none;opacity:0}
+    .flow.active .pulse{animation:pulse-run 4.2s ease-in-out 1.2s infinite}
+    @keyframes pulse-run{0%{left:166px;opacity:0}8%{opacity:1}88%{opacity:1}100%{left:calc(100% - 20px);opacity:0}}
+    .flow-step{position:relative;min-height:157px;border-top:3px solid rgba(50,212,204,.32);padding:22px 4px 0 0}
+    .flow-step:after{content:"";position:absolute;top:-7px;left:0;width:11px;height:11px;border-radius:50%;background:var(--cyan)}
+    .flow-step:not(:last-child):before{content:"";position:absolute;top:-3px;left:8px;right:-16px;border-top:3px solid var(--cyan);opacity:.3}
+    .flow-step b{display:block;color:var(--cyan);font-size:17px;letter-spacing:.13em;margin-bottom:15px}
+    .flow-step strong{display:block;font-size:28px;line-height:1.28;letter-spacing:-.035em}
+    .flow-step small{display:block;color:#a3aec4;font-size:18px;line-height:1.4;margin-top:9px}
+    .flow.active .flow-step{animation:flow-bright .7s ease both;animation-delay:calc(.15s + var(--i)*.12s)}
+    @keyframes flow-bright{from{opacity:.25;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+
+    /* 06 — demo */
+    .demo h2{margin-bottom:10px}
+    .demo .sub{font-size:25px;color:#b4bed2;margin-bottom:30px}
+    .demo-layout{display:grid;grid-template-columns:920px 1fr;gap:38px}
+    .video-shell{width:920px;height:468px;border:1px solid rgba(50,212,204,.58);background:#060b19;position:relative;overflow:hidden}
+    .video-shell video{display:none;width:100%;height:100%;object-fit:contain;background:#000}
+    .video-shell.ready video{display:block}
+    .video-shell.ready .video-placeholder{display:none}
+    .video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at center,#1a2752,#070c1c 62%)}
+    .play-symbol{width:94px;height:94px;border:2px solid var(--cyan);border-radius:50%;display:grid;place-items:center;color:var(--cyan);font-size:40px;margin-bottom:28px;padding-left:6px}
+    .video-placeholder strong{font-size:28px;margin-bottom:7px}
+    .video-placeholder small{font-size:19px;color:#a1acc3}
+    .demo-steps{margin:4px 0 0;padding:0;list-style:none;counter-reset:demo}
+    .demo-steps li{counter-increment:demo;display:flex;align-items:baseline;gap:14px;padding:19px 0;border-bottom:1px solid rgba(255,255,255,.16);font-size:24px;font-weight:700}
+    .demo-steps li:before{content:"0" counter(demo);color:var(--cyan);font:800 18px Arial,sans-serif}
+    .demo-steps .note{font-size:17px;line-height:1.5;color:#a2adc4;margin-top:25px}
+
+    /* 07 — measured extent */
+    .results h2{max-width:1070px}
+    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:78px;margin-top:61px}
+    .result{border-top:2px solid #b7cac3;padding-top:23px}
+    .result .label{font-size:25px;line-height:1.4;font-weight:750;margin-bottom:13px}
+    .result .value{font-size:122px;line-height:1;font-family:Arial,sans-serif;color:var(--cyan-deep);font-weight:900;letter-spacing:-.085em}
+    .result .value small{font-size:50px;letter-spacing:-.05em;color:#547476}
+    .result .detail{font-size:21px;color:#5f7273;margin-top:22px}
+    .results .scope{margin-top:38px;font-size:22px;border-left:4px solid var(--cyan-deep);padding-left:19px;line-height:1.45}
+
+    /* 08 — honest shortfalls */
+    .gaps h2{margin-bottom:15px}
+    .gaps .sub{font-size:25px;margin-bottom:30px;color:#a9b4ca}
+    .chart{width:100%;margin-top:2px}
+    .ticks{display:flex;justify-content:space-between;color:#7d89a3;font:16px Arial,sans-serif;padding-left:360px;padding-right:74px;margin-bottom:11px}
+    .metric{display:grid;grid-template-columns:338px 1fr;gap:22px;padding:16px 0;border-top:1px solid rgba(244,255,250,.15)}
+    .metric-name{font-size:23px;font-weight:800;line-height:1.3}
+    .metric-name small{display:block;color:#a0abc2;font-size:16px;font-weight:400;margin-top:4px}
+    .bar-pair{display:grid;grid-template-columns:1fr 60px;gap:4px 14px;align-items:end}
+    .barw{position:relative;padding-top:24px}
+    .val{position:absolute;top:0;left:var(--w);transform:translateX(-50%);font:800 17px Arial,sans-serif;white-space:nowrap}
+    .val.t{color:#78dbd6}.val.a{color:var(--orange)}
+    .gaps.active .val{animation:enter .5s ease 1s both}
+    .bar{height:12px;background:rgba(255,255,255,.09);position:relative;overflow:hidden}
+    .bar:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),rgba(255,255,255,.12) calc(25% - 1px),rgba(255,255,255,.12) 25%);z-index:2}
+    .bar i{display:block;height:100%;width:var(--w);background:var(--cyan);transform-origin:left}
+    .bar.actual i{background:var(--orange)}
+    .gaps.active .bar i{animation:grow .9s cubic-bezier(.2,.75,.2,1) both}
+    @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+    .bar-pair b{font:700 17px Pretendard,'Malgun Gothic',sans-serif;text-align:left;line-height:12px}
+    .bar-pair .target-label{color:#78dbd6}.bar-pair .actual-label{color:var(--orange)}
+    .gaps .example{margin-top:22px;font-size:22px;color:#c6cee0}
+    .gaps .example strong{color:var(--orange)}
+
+    /* 09 — technology */
+    .tech h2{margin-bottom:12px}
+    .stack{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-top:18px;position:relative}
+    .stack:before{content:"";position:absolute;left:10%;right:10%;top:46px;height:2px;background:var(--cyan-deep);opacity:.42}
+    .stack-part{position:relative;padding-top:70px}
+    .stack-part:before{content:"";position:absolute;top:36px;left:0;width:21px;height:21px;border-radius:50%;background:var(--cyan-deep);box-shadow:0 0 0 9px rgba(8,126,128,.13)}
+    .stack-part b{display:block;font-size:20px;color:var(--cyan-deep);margin-bottom:11px}
+    .stack-part strong{font-size:26px;line-height:1.34;letter-spacing:-.025em}
+    .stack-part small{display:block;font-size:18px;color:#5d7072;margin-top:9px;line-height:1.4}
+    .trouble{display:grid;grid-template-columns:1fr 1fr;gap:20px 40px;margin-top:26px;border-top:1px solid #b7c9c1;padding-top:25px}
+    .trouble .tag{display:block;color:var(--cyan-deep);font-size:17px;font-weight:900;margin-bottom:10px}
+    .trouble p{font-size:21px;line-height:1.4;margin:0}
+    .trouble .note{display:block;margin-top:6px;font-size:14px;color:#667779}
+    .trouble b{color:#a95734}
+
+    /* 10 — roadmap */
+    .road h2{margin-bottom:34px}
+    .road-list{list-style:none;margin:0;padding:0}
+    .road-list li{display:grid;grid-template-columns:130px 1fr;align-items:center;border-top:1px solid rgba(255,255,255,.2);min-height:118px}
+    .road-list li:last-child{border-bottom:1px solid rgba(255,255,255,.2)}
+    .road-list .n{font:900 56px Arial,sans-serif;color:var(--cyan);letter-spacing:-.06em}
+    .road-list strong{font-size:34px;line-height:1.36;letter-spacing:-.03em}
+    .road-list li:nth-child(2) strong{color:#ffb495}
+    .road .foot{font-size:19px;color:#94a0b9;margin-top:25px}
+
+    /* 11 — impact */
+    .impact h2{margin-bottom:40px}
+    .who{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+    .who>div{position:relative;background:#fff;border-top:4px solid var(--cyan-deep);padding:26px 24px 24px;min-height:378px;display:flex;flex-direction:column;box-shadow:0 14px 30px rgba(13,21,48,.07)}
+    .who .role{font-size:19px;font-weight:800;color:var(--cyan-deep);letter-spacing:-.01em}
+    .who .fig{font-size:66px;line-height:1;margin:22px 0 16px;color:var(--ink)}
+    .who .fig small{font-size:26px;letter-spacing:-.02em;margin-left:3px;color:#46506a}
+    .who .fig i{font-style:normal;font-size:30px;color:var(--cyan-deep);margin:0 8px;vertical-align:middle}
+    .who p{font-size:18px;line-height:1.5;color:#46506a;margin:0}
+    .who strong{margin-top:auto;padding-top:16px;border-top:1px solid #d3dbd8;font-size:19px;line-height:1.4}
+    .impact .source{bottom:92px;font-size:14px;line-height:1.5}
+
+    /* 12 — team */
+    .team h2{margin-bottom:84px}
+    .team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+    .person{border-top:2px solid rgba(50,212,204,.65);padding-top:30px}
+    .person .mono{display:grid;place-items:center;width:176px;height:176px;border-radius:50%;margin-bottom:34px;background:var(--ink2);border:2px solid rgba(50,212,204,.5);font-size:76px;font-weight:900;color:var(--cyan)}
+    .person .name{font-size:52px;font-weight:900;letter-spacing:-.07em;display:block;margin-bottom:12px}
+    .person .role{font-size:23px;color:#adb8cd;line-height:1.4}
+    .person .order{font:700 17px Arial,sans-serif;color:var(--cyan);margin-bottom:17px}
+    .team .endline{position:absolute;left:88px;right:88px;bottom:96px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+
+    /* 13 — closing */
+    .thanks{display:flex;flex-direction:column;justify-content:center}
+    .thanks .eyebrow{margin-bottom:32px}
+    .thanks h2{font:900 108px/1.06 Arial,"Malgun Gothic",sans-serif;letter-spacing:-.075em;margin-bottom:15px}
+    .thanks .qa{font-size:66px;color:var(--cyan);font-weight:800;letter-spacing:-.065em}
+    .thanks .by{font-size:21px;color:#a6b1c8;margin-top:63px}
+    .thanks .terminal{position:absolute;right:-64px;top:40px;width:540px;height:540px;border:2px solid rgba(50,212,204,.23);border-radius:50%}
+    .thanks .terminal:after{content:"";position:absolute;inset:85px;border:1px solid rgba(50,212,204,.35);border-radius:50%}
+    .thanks.active .terminal{animation:orbit-in 1s ease-out both}
+
+    @media (prefers-reduced-motion:reduce){
+      *,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+      .reveal{opacity:1;transform:none}
+      .bar i{transform:none}
+    }
+  </style>
+</head>
+<body>
+  <main id="stage" aria-label="FORSTICK 최종 발표">
+    <section class="slide dark hero active" data-title="FORSTICK" aria-label="1장 FORSTICK">
+      <div class="orbit" aria-hidden="true"><i class="dot"></i></div><div class="line-signal" aria-hidden="true"></div>
+      <p class="eyebrow reveal">한국어 음성 기반 로봇 작업지시</p>
+      <h1 class="reveal" style="--delay:.12s">FORSTICK</h1>
+      <p class="subtitle reveal" style="--delay:.22s">말로 지시하고, 검증 후 움직이다</p>
+      <span class="corner-index">FINAL PRESENTATION</span>
+    </section>
+
+    <section class="slide light agenda" data-title="오늘의 이야기" aria-label="2장 오늘의 이야기">
+      <p class="eyebrow reveal">Overview</p>
+      <h2 class="reveal" style="--delay:.08s">오늘의 이야기</h2>
+      <div class="agenda-grid">
+        <div class="agenda-item reveal" style="--delay:.13s"><span class="n">01</span><strong>왜 시작했나</strong><small>기획 배경과 서비스</small></div>
+        <div class="agenda-item reveal" style="--delay:.21s"><span class="n">02</span><strong>어떻게 쓰나</strong><small>사용자 흐름과 시연</small></div>
+        <div class="agenda-item reveal" style="--delay:.29s"><span class="n">03</span><strong>무엇을 확인했나</strong><small>평가 결과와 한계</small></div>
+        <div class="agenda-item reveal" style="--delay:.37s"><span class="n">04</span><strong>무엇으로 만들었나</strong><small>기술과 개선 과정</small></div>
+        <div class="agenda-item reveal" style="--delay:.45s"><span class="n">05</span><strong>다음은 무엇인가</strong><small>발전 방향과 팀</small></div>
+      </div>
+    </section>
+
+    <section class="slide dark problem" data-title="기획 배경" aria-label="3장 기획 배경">
+      <p class="eyebrow reveal">01 / Why</p>
+      <h2 class="reveal" style="--delay:.08s">기획 배경</h2>
+      <div class="giant reveal" style="--delay:.14s">작업이 바뀔 때마다<br><span class="warm">설정은 어렵다</span></div>
+      <div class="bridge" aria-hidden="true"></div>
+      <div class="right-story reveal" style="--delay:.42s">
+        <p>작업자는 <b>한국어로 지시</b>하고</p>
+        <p>시스템은 <b class="accent">실행 전에 검증</b>한다</p>
+      </div>
+      <p class="caveat">현장의 실제 재설정 시간과 절감 효과는 후속 실증 대상</p>
+    </section>
+
+    <section class="slide light service" data-title="서비스 소개" aria-label="4장 서비스 소개">
+      <p class="eyebrow reveal">02 / Service</p>
+      <h2 class="reveal" style="--delay:.08s">서비스 소개</h2>
+      <div class="service-wrap">
+        <div class="reveal" style="--delay:.16s">
+          <div class="service-copy">AI는 <em>작업 계획</em>을 만들고,<br>실행 여부는 <em>검증</em>이 정합니다.</div>
+          <div class="decision-words"><span>PASS</span><span>ASK</span><span>BLOCK</span></div>
+          <p style="font-size:21px;color:#5e7375;margin-top:34px">한국어 음성·텍스트 → JSON Task Plan → FR3 Gazebo 작업 셀</p>
+        </div>
+        <figure class="screen-shot reveal" style="--delay:.29s">
+          <img src="images/dashboard_home.png" alt="FORSTICK 종합 관제 대시보드 실제 화면">
+          <figcaption>실제 운영 화면 · 2026.10.08</figcaption></figure>
+        <figure class="sim-inset reveal" style="--delay:.5s"><img src="images/sim_view.png" alt="시뮬레이션 보기 창: FR3 작업 셀 3D 관측과 관절 상태"><figcaption>시뮬레이션 보기 · FR3 작업 셀</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="slide dark flow" data-title="사용자 흐름" aria-label="5장 사용자 흐름">
+      <p class="eyebrow reveal">03 / Full Cycle</p>
+      <h2 class="reveal" style="--delay:.08s">사용자 흐름</h2>
+      <p class="sub reveal" style="--delay:.14s">어디서 되묻고, 어디서 막는지</p>
+      <div class="cycle">
+        <span class="lane-label"></span>
+        <div class="flow-step" style="--i:1"><b>01</b><strong>말하기</strong><small>음성 · 텍스트</small></div>
+        <div class="flow-step" style="--i:2"><b>02</b><strong>의도 해석</strong><small>자재 · 위치 확인</small></div>
+        <div class="flow-step" style="--i:3"><b>03</b><strong>작업 계획</strong><small>정해진 스킬만</small></div>
+        <div class="flow-step" style="--i:4"><b>04</b><strong>실행 전 검증</strong><small>안전 규칙 · MoveIt</small></div>
+        <div class="flow-step" style="--i:5"><b>05</b><strong>작업자 승인</strong><small>확인 카드</small></div>
+        <div class="flow-step" style="--i:6"><b>06</b><strong>실행 · 기록</strong><small>직전 재검증 → FR3</small></div>
+        <i class="pulse" aria-hidden="true"></i>
+
+        <span class="lane-label ask reveal" style="--delay:.95s">ASK<em>되묻기</em></span>
+        <span class="chip ask reveal" style="grid-column:3;--delay:1.05s">대상·목적지가 불분명<br>작업이 여러 개</span>
+        <span class="chip ask reveal" style="grid-column:5;--delay:1.15s">관측 정보 부족<br>놓을 물체 미확인</span>
+
+        <span class="lane-label block reveal" style="--delay:1.3s">BLOCK<em>차단</em></span>
+        <span class="chip block reveal" style="grid-column:3;--delay:1.4s">등록 안 된 자재<br>출발지에 자재 없음</span>
+        <span class="chip block reveal" style="grid-column:5;--delay:1.5s">안전 규칙 위반<br>충돌 · 도달 불가</span>
+        <span class="chip block reveal" style="grid-column:7;--delay:1.6s">승인 뒤 조건이 바뀌면<br>실행 거부</span>
+
+        <span class="lane-label stop reveal" style="--delay:1.75s">STOP<em>정지</em></span>
+        <span class="chip stop reveal" style="grid-column:2;--delay:1.85s">“멈춰”<br>AI 없이 즉시</span>
+        <span class="stop-span reveal" style="--delay:1.95s">헤더 즉시 정지 버튼은 어느 단계에서든 동작</span>
+      </div>
+    </section>
+
+    <section class="slide dark demo" data-title="시연" aria-label="6장 시연">
+      <p class="eyebrow reveal">04 / Demo</p>
+      <h2 class="reveal" style="--delay:.08s">시연</h2>
+      <p class="sub reveal" style="--delay:.15s">녹화 영상으로 작업의 전체 흐름을 보여드립니다.</p>
+      <div class="demo-layout">
+        <div class="video-shell reveal" style="--delay:.2s" id="videoShell">
+          <video id="demoVideo" src="시연.mp4" controls playsinline preload="metadata" aria-label="FORSTICK 시연 영상"></video>
+          <div class="video-placeholder" id="videoPlaceholder">
+            <div class="play-symbol" aria-hidden="true">▶</div>
+            <strong>시연.mp4 영상 자리</strong>
+            <small>파일을 이 HTML과 같은 폴더에 넣으면 자동으로 표시됩니다.</small>
+          </div>
+        </div>
+        <div class="reveal" style="--delay:.3s">
+          <ol class="demo-steps">
+            <li>한국어 작업 지시</li>
+            <li>계획과 확인 카드</li>
+            <li>Gazebo FR3 동작</li>
+            <li>결과와 기록 확인</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide light results" data-title="어디까지 확인했나" aria-label="7장 어디까지 확인했나">
+      <p class="eyebrow reveal">05 / Evidence</p>
+      <h2 class="reveal" style="--delay:.08s">어디까지 확인했나</h2>
+      <p class="sub reveal" style="--delay:.15s">PC1 봉인 세트 100문장 · 실제 Qwen과 MoveIt을 포함한 계획·판정 평가</p>
+      <div class="result-grid">
+        <div class="result reveal" style="--delay:.24s">
+          <div class="label">위험·불가 지시 실행 통과</div>
+          <div class="value big-num">0<small> / 65</small></div>
+          <div class="detail">기대 BLOCK·ASK·STOP 입력 중 PASS 0건</div>
+        </div>
+        <div class="result reveal" style="--delay:.36s">
+          <div class="label">정지 발화의 별도 정지 경로</div>
+          <div class="value big-num">12<small> / 12</small></div>
+          <div class="detail">정지 발화는 모델 계획 경로를 우회</div>
+        </div>
+      </div>
+      <p class="scope reveal" style="--delay:.48s">이 수치는 계획·판정 단계의 시뮬레이션 평가입니다. 로봇 이동 성능이나 실물 안전성의 측정값은 아닙니다.</p>
+      <p class="source">근거: PC1 평가요약(2026-10-08), QA 자동화 분류</p>
+    </section>
+
+    <section class="slide dark gaps" data-title="아직 부족한 점" aria-label="8장 아직 부족한 점">
+      <p class="eyebrow reveal">06 / Gap</p>
+      <h2 class="reveal" style="--delay:.08s">아직 부족한 점</h2>
+      <p class="sub reveal" style="--delay:.15s">안전한 차단만으로는 충분하지 않습니다. 정상 지시도 정확히 받아야 합니다.</p>
+      <div class="chart reveal" style="--delay:.2s">
+        <div class="ticks"><span>0</span><span>25</span><span>50</span><span>75</span><span>100%</span></div>
+        <div class="metric">
+          <div class="metric-name">정상 지시 오차단<small>낮을수록 좋음 · 정상 35문장</small></div>
+          <div class="bar-pair"><div class="barw"><span class="val t" style="--w:10%">10%</span><div class="bar"><i style="--w:10%"></i></div></div><b class="target-label">목표</b><div class="barw"><span class="val a" style="--w:17.1%">17.1%</span><div class="bar actual"><i style="--w:17.1%"></i></div></div><b class="actual-label">실측</b></div>
+        </div>
+        <div class="metric">
+          <div class="metric-name">애매 지시 되묻기<small>높을수록 좋음 · 애매 32문장</small></div>
+          <div class="bar-pair"><div class="barw"><span class="val t" style="--w:80%">80%</span><div class="bar"><i style="--w:80%"></i></div></div><b class="target-label">목표</b><div class="barw"><span class="val a" style="--w:65.6%">65.6%</span><div class="bar actual"><i style="--w:65.6%"></i></div></div><b class="actual-label">실측</b></div>
+        </div>
+        <div class="metric">
+          <div class="metric-name">정상 지시 되묻기<small>낮을수록 좋음 · 정상 35문장</small></div>
+          <div class="bar-pair"><div class="barw"><span class="val t" style="--w:15%">15%</span><div class="bar"><i style="--w:15%"></i></div></div><b class="target-label">목표</b><div class="barw"><span class="val a" style="--w:22.9%">22.9%</span><div class="bar actual"><i style="--w:22.9%"></i></div></div><b class="actual-label">실측</b></div>
+        </div>
+      </div>
+      <p class="example reveal" style="--delay:.4s">대표 사례: “1번 팔레트에 가 있어”를 <strong>자재 이송 지시로 오해</strong>해 되묻습니다.</p>
+      <p class="source">모든 비율 막대: 동일한 0–100% 축 · 근거: PC1 평가요약(2026-10-08), 팀원 전달(2026-10-08)</p>
+    </section>
+
+    <section class="slide light tech" data-title="기술 구성과 트러블슈팅" aria-label="9장 기술 구성과 트러블슈팅">
+      <p class="eyebrow reveal">07 / Build</p>
+      <h2 class="reveal" style="--delay:.08s">기술 구성과 트러블슈팅</h2>
+      <div class="stack">
+        <div class="stack-part reveal" style="--delay:.16s"><b>FRONTEND</b><strong>React · Vite<br>관제 대시보드</strong><small>서버 값 표시 · 음성/텍스트 입력</small></div>
+        <div class="stack-part reveal" style="--delay:.27s"><b>BACKEND</b><strong>Python ASGI · SQLite<br>계획과 검증</strong><small>faster-whisper · Qwen3-8B · 규칙 검사</small></div>
+        <div class="stack-part reveal" style="--delay:.38s"><b>ROBOTICS</b><strong>ROS 2 · MoveIt 2<br>Gazebo FR3</strong><small>경로 검증 · 시뮬레이션 실행</small></div>
+      </div>
+      <div class="trouble">
+        <div class="reveal" style="--delay:.5s"><span class="tag">프론트엔드</span><p>목업 수치를 제거하고 <b>서버에 없는 값은 ‘확인 안 됨’</b>으로 표시</p></div>
+        <div class="reveal" style="--delay:.6s"><span class="tag">백엔드 평가기</span><p>인자 불일치로 전부 BLOCK으로 기록되던 평가 래퍼와 <b>STOP 채점 오류를 수정</b></p><small class="note">평가 스크립트 정정 · 제품 성능 개선 아님</small></div>
+        <div class="reveal" style="--delay:.7s"><span class="tag">백엔드</span><p>줄임말에서 출발지·목적지가 뒤바뀌던 문제를 <b>하나의 검증된 작업 의도로 통일</b></p></div>
+        <div class="reveal" style="--delay:.8s"><span class="tag">백엔드</span><p>“멈춰”도 AI 모델을 거치던 경로를 <b>모델 없이 즉시 정지</b>로 분리</p></div>
+      </div>
+    </section>
+
+    <section class="slide dark road" data-title="향후 발전 방향" aria-label="10장 향후 발전 방향">
+      <p class="eyebrow reveal">08 / Next</p>
+      <h2 class="reveal" style="--delay:.08s">향후 발전 방향</h2>
+      <ol class="road-list">
+        <li class="reveal" style="--delay:.17s"><span class="n">01</span><strong>위치 이동 해석 개선으로 정상 지시 오차단 낮추기</strong></li>
+        <li class="reveal" style="--delay:.27s"><span class="n">02</span><strong>실물 FR3 연동과 하드웨어 비상정지 연결</strong></li>
+        <li class="reveal" style="--delay:.37s"><span class="n">03</span><strong>여러 작업 셀 기록을 PostgreSQL로 통합</strong></li>
+        <li class="reveal" style="--delay:.47s"><span class="n">04</span><strong>FR3 외 다양한 로봇 모델 적용</strong></li>
+      </ol>
+      <p class="foot reveal" style="--delay:.57s">현재 실물 FR3 연결 구현은 아직 없습니다.</p>
+    </section>
+
+    <section class="slide light impact" data-title="기대 효과" aria-label="11장 기대 효과">
+      <p class="eyebrow reveal">09 / Impact</p>
+      <h2 class="reveal" style="--delay:.08s">누가, 무엇을 얻나</h2>
+      <div class="who">
+        <div class="reveal" style="--delay:.16s"><span class="role">현장 작업자</span><div class="fig big-num">48<small>분</small><i>→</i>8<small>분</small></div><p>직관적 지시 방식으로 조립 작업 재프로그래밍 시간 83% 단축 사례</p><strong>티칭펜던트 대신 말로 작업 변경</strong></div>
+        <div class="reveal" style="--delay:.26s"><span class="role">제조 중소기업</span><div class="fig big-num">47.1<small>%</small></div><p>인력을 늘리지 못하는 가장 큰 이유가 ‘비용 부담’</p><strong>전문 인력 없이 기존 로봇 활용</strong></div>
+        <div class="reveal" style="--delay:.36s"><span class="role">안전 관리자</span><div class="fig big-num">26<small>명</small></div><p>11년간 산업용 로봇 산재 사망. 비정형 작업 사고의 약 83%가 로봇을 멈추지 않은 상태</p><strong>실행 전 차단 · 음성 즉시 정지</strong></div>
+        <div class="reveal" style="--delay:.46s"><span class="role">교육 · 훈련 기관</span><div class="fig big-num">6.6<small>%</small></div><p>스마트공장 교육 예산을 따로 둔 기업 비율</p><strong>실물 로봇 없이 계획·검증 실습</strong></div>
+      </div>
+      <p class="source">출처: Perzylo et al., “Intuitive Instruction of Industrial Robots”, IEEE/RSJ IROS 2016 · 중소벤처기업부 「2024년 스마트제조혁신 실태조사」 2025.04.28 · 고용노동부 재해 승인 통계(2014–2024), 세계일보 2026.04.27 보도</p>
+    </section>
+
+    <section class="slide dark team" data-title="팀원 소개 및 역할" aria-label="12장 팀원 소개 및 역할">
+      <p class="eyebrow reveal">10 / Team</p>
+      <h2 class="reveal" style="--delay:.08s">팀원 소개 및 역할</h2>
+      <div class="team-grid">
+        <div class="person reveal" style="--delay:.18s"><div class="order">01 / TEAM LEAD</div><span class="mono">손</span><span class="name">손대호</span><span class="role">팀장 · 프론트엔드</span></div>
+        <div class="person reveal" style="--delay:.27s"><div class="order">02 / PM</div><span class="mono">김</span><span class="name">김예은</span><span class="role">팀원 · PM</span></div>
+        <div class="person reveal" style="--delay:.36s"><div class="order">03 / BACKEND</div><span class="mono">김</span><span class="name">김남수</span><span class="role">팀원 · 백엔드·DB</span></div>
+        <div class="person reveal" style="--delay:.45s"><div class="order">04 / DOCUMENTATION</div><span class="mono">이</span><span class="name">이윤예</span><span class="role">팀원 · 문서</span></div>
+      </div>
+      <div class="endline" aria-hidden="true"></div>
+    </section>
+
+    <section class="slide dark thanks" data-title="Thank you · Q&A" aria-label="13장 Thank you · Q&A">
+      <div class="terminal" aria-hidden="true"></div>
+      <p class="eyebrow reveal">FORSTICK</p>
+      <h2 class="reveal" style="--delay:.12s">Thank you.</h2>
+      <div class="qa reveal" style="--delay:.24s">Q&amp;A</div>
+    </section>
+
+    <div id="chrome" aria-label="슬라이드 탐색">
+      <span class="brand">FORSTICK</span>
+      <span class="progress" aria-hidden="true"><i id="progressFill"></i></span>
+      <span class="count"><span id="currentPage">01</span> / <span id="totalPages">13</span></span>
+      <span class="controls"><button id="prev" type="button" aria-label="이전 슬라이드">←</button><button id="next" type="button" aria-label="다음 슬라이드">→</button></span>
+    </div>
+  </main>
+  <script>
+    (function(){
+      var stage=document.getElementById('stage');
+      var slides=Array.from(stage.querySelectorAll('.slide'));
+      var current=0;
+      var video=document.getElementById('demoVideo');
+      var videoShell=document.getElementById('videoShell');
+      var pad=function(n){return String(n).padStart(2,'0')};
+      function fit(){
+        var scale=Math.min(window.innerWidth/1440,window.innerHeight/810);
+        stage.style.transform='translate(-50%,-50%) scale('+scale+')';
+      }
+      function show(index){
+        index=Math.max(0,Math.min(slides.length-1,index));
+        if(index===current&&slides[current].classList.contains('active'))return;
+        if(video&&!video.paused)video.pause();
+        slides[current].classList.remove('active');
+        current=index;
+        slides[current].classList.add('active');
+        stage.classList.toggle('on-light',slides[current].classList.contains('light'));
+        document.getElementById('currentPage').textContent=pad(current+1);
+        document.getElementById('totalPages').textContent=pad(slides.length);
+        document.getElementById('progressFill').style.width=(((current+1)/slides.length)*100)+'%';
+        document.getElementById('prev').disabled=current===0;
+        document.getElementById('next').disabled=current===slides.length-1;
+        document.title='FORSTICK | '+pad(current+1)+' '+slides[current].dataset.title;
+      }
+      document.getElementById('prev').addEventListener('click',function(event){event.stopPropagation();show(current-1)});
+      document.getElementById('next').addEventListener('click',function(event){event.stopPropagation();show(current+1)});
+      stage.addEventListener('click',function(event){
+        if(event.target.closest('button,video,a,input,textarea,select'))return;
+        show(current+1);
+      });
+      document.addEventListener('keydown',function(event){
+        if(event.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName))return;
+        if(['ArrowRight','ArrowDown','PageDown',' '].includes(event.key)){event.preventDefault();show(current+1)}
+        else if(['ArrowLeft','ArrowUp','PageUp'].includes(event.key)){event.preventDefault();show(current-1)}
+        else if(event.key==='Home'){event.preventDefault();show(0)}
+        else if(event.key==='End'){event.preventDefault();show(slides.length-1)}
+      });
+      if(video){
+        video.addEventListener('loadedmetadata',function(){videoShell.classList.add('ready')});
+        video.addEventListener('error',function(){videoShell.classList.remove('ready')});
+      }
+      window.addEventListener('resize',fit);
+      fit();
+      slides[0].classList.remove('active');
+      show(0);
+    })();
+  </script>
+</body>
+</html>
